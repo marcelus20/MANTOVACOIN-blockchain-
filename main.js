@@ -99,6 +99,41 @@ class Blockchain{
         this.chain.push(newBlock);
     }
 
+
+    /**
+     * Checking integrity of the block
+     * If hash of any block is diferent from the previous hash of the next block, then
+     * the block has been tampered
+     */
+    isValid(){
+
+
+        /**
+         * loop over until the end of the chain, begining from the second block
+         */
+        for(let i = 1; i < this.chain.length; i++){
+            const previousBlock = this.chain[i-1];
+            const currentBlock = this.chain[i];
+
+            // if the previous block does not point to the actual, then it is not a valid block
+            if(previousBlock.hash !== currentBlock.pHash){
+                return false;
+            }
+
+            // if the block has been tampered, the currentBlock.hash won be the same as createing a ew,
+            //cause any information modified changed substantially the hash
+            if(currentBlock.hash !== currentBlock.createHash()){
+                return false;
+            }
+        }
+
+
+        //if loop is finished and does not encounter anything wrong, then block is valid
+        return true;
+
+
+    }
+
 }
 
 
@@ -116,6 +151,18 @@ mantovacoin.addBlock(new Block(4, "28/1/2015", { transfered: 7}));
 
 //printing to console:
 console.log(JSON.stringify(mantovacoin, null, 4));
+
+console.log("IS MANTOVACOIN VALID "+mantovacoin.isValid()); // should be true
+
+//TAMPERING/MODIFYING BLOCK first block
+mantovacoin.chain[1].data = {transfered: 10};
+
+//printing the blockchain tampered
+console.log(JSON.stringify(mantovacoin, null, 4));
+
+
+console.log("IS MANTOVACOIN VALID "+mantovacoin.isValid()); // shoould be false
+
 
 
 
