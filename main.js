@@ -15,7 +15,7 @@ The Block class will have the following attributes: an Index, timestamp, data an
  the pHash stands for Previous Hash. As this is a block chain, the hash of the current block is related to the previous
   hash, so the hash of the previous block should be passed as parameter
  */
-public class Block{
+class Block{
     constructor(index, timestamp, data, pHash = ''){
         this.index = index;
         this.timestamp = timestamp;
