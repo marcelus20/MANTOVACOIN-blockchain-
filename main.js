@@ -31,6 +31,7 @@ class Block{
         this.data = data;
         this.pHash = pHash;
         this.hash = this.createHash();
+        this.nonce = 0; // the only value allowed to change in order to mine the block;
 
     }
 
@@ -45,7 +46,21 @@ class Block{
          * in order to get the string vertion of the JSON stringfy, it will be called toSitring, cause
          * I want the SHA256 to hash a string, not a object.
          */
-        return SHA256(this.index + this.timestamp + this.pHash + JSON.stringify(this.data)).toString();
+        return SHA256(this.index + this.timestamp + this.pHash + JSON.stringify(this.data) + this.nonce).toString();
+    }
+
+    /**
+     * Mining block method
+     * PROOF OF WORK
+     * @param difficulty
+     */
+    mineBlock(difficulty){
+
+        while(this.hash.substring(0, difficulty) !== Array(difficulty+1).join("0")){
+            this.nonce++;
+            this.hash = this.createHash();
+
+        }
     }
 }
 
@@ -60,6 +75,13 @@ class Blockchain{
 
     constructor(){
         this.chain = [this.createGenesisBlock()];
+
+        /**
+         * The time of the proof of work will depend on the difficulty attribute
+         * THe higher the difficulty value, the more time it will take to mine the block
+         * @type {number}
+         */
+        this.difficulty = 5;
     }
 
 
@@ -93,10 +115,12 @@ class Blockchain{
 
 
         //updating the hash
-        newBlock.hash = newBlock.createHash();
+        newBlock.mineBlock(this.difficulty);
 
         //finally adding to the chain:
         this.chain.push(newBlock);
+
+        console.log("Block Mined! hash:" + newBlock.hash);
     }
 
 
@@ -143,28 +167,20 @@ const mantovacoin = new Blockchain(); // instance
 
 // adding blocks into it;
 
+//proof of work test: CHANGE THE DIFFICULTY IN ORDER TO SEE THE DIFFERENCE IN TIME.
+
+
+console.log("Mining block");
 mantovacoin.addBlock(new Block(1, "28/1/2015", { transfered: 4}));
+console.log("Mining block");
 mantovacoin.addBlock(new Block(2, "28/1/2015", { transfered: 15}));
+console.log("Mining block");
 mantovacoin.addBlock(new Block(3, "28/1/2015", { transfered: 50}));
+console.log("Mining block");
 mantovacoin.addBlock(new Block(4, "28/1/2015", { transfered: 7}));
 
 
-//printing to console:
-console.log(JSON.stringify(mantovacoin, null, 4));
 
-console.log("IS MANTOVACOIN VALID? "+mantovacoin.isValid()); // should be true
-
-//TAMPERING/MODIFYING BLOCK first block
-
-//for tampering the blocks, it will be changed the data, for example, from 4, it will be transfered 10
-//which is a fraud, after this change, the block should not be valid, then false.
-mantovacoin.chain[1].data = {transfered: 10};
-
-//printing the blockchain tampered
-console.log(JSON.stringify(mantovacoin, null, 4));
-
-
-console.log("IS MANTOVACOIN VALID?"+mantovacoin.isValid()); // shoould be false
 
 
 
