@@ -30,7 +30,7 @@ class Block{
         this.timestamp = timestamp;
         this.data = data;
         this.pHash = pHash;
-        this.hash = '';
+        this.hash = this.createHash();
 
     }
 
@@ -47,5 +47,57 @@ class Block{
          */
         return SHA256(this.index + this.timestamp + this.pHash + JSON.stringify(data).toString());
     }
+}
+
+
+/**
+ * The Blockchain class will be just an array of Blocks, as not blocks have been created yet,
+ * the genesis block will be added manually, it will be done by a method that will be trigered if
+ * The array is empty
+ */
+
+class Blockchain{
+
+    constructor(){
+        this.chain = [this.createGenesisBlock()];
+    }
+
+
+    /**
+     * creates the very first block
+     * @returns {Block}
+     */
+    createGenesisBlock = () => {
+        return new Block(0, "21/5/2018", "The very fisrt block", "0");
+    }
+
+
+    /**
+     * getter for the latest block of the chain attribute
+     * @returns The last block itself
+     */
+    getLatestBlock = () => {
+        return this.chain[this.chain.length-1];
+    }
+
+
+    /**
+     * Adding neww block to the chain.
+     * @param newBlock
+     */
+    addBlock = (newBlock) => {
+        /**
+         * For that, it will firstly retrieve the hash of the latest block
+         */
+        newBlock.pHash = this.getLatestBlock().hash;
+
+
+        //updating the hash
+        newBlock.hash = newBlock.createHash();
+
+        //finally adding to the chain:
+        this.chain.push(newBlock);
+    }
+
 }
 
