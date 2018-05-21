@@ -15,6 +15,15 @@ The Block class will have the following attributes: an Index, timestamp, data an
  the pHash stands for Previous Hash. As this is a block chain, the hash of the current block is related to the previous
   hash, so the hash of the previous block should be passed as parameter
  */
+
+
+
+
+//importing the library for the hashing function
+const SHA256 = require('crypto-js/sha256');
+
+
+
 class Block{
     constructor(index, timestamp, data, pHash = ''){
         this.index = index;
@@ -23,6 +32,20 @@ class Block{
         this.pHash = pHash;
         this.hash = '';
 
+    }
+
+
+    /**
+     * The hashing function utilised is the SHA256 imported from the crypto-js modules.
+     */
+    createHash = () =>{
+
+        /**
+         * The return is the hashing of every attribute together.
+         * in order to get the string vertion of the JSON stringfy, it will be called toSitring, cause
+         * I want the SHA256 to hash a string, not a object.
+         */
+        return SHA256(this.index + this.timestamp + this.pHash + JSON.stringify(data).toString());
     }
 }
 
