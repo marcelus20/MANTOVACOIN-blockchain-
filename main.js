@@ -38,14 +38,14 @@ class Block{
     /**
      * The hashing function utilised is the SHA256 imported from the crypto-js modules.
      */
-    createHash = () =>{
+    createHash (){
 
         /**
          * The return is the hashing of every attribute together.
          * in order to get the string vertion of the JSON stringfy, it will be called toSitring, cause
          * I want the SHA256 to hash a string, not a object.
          */
-        return SHA256(this.index + this.timestamp + this.pHash + JSON.stringify(data).toString());
+        return SHA256(this.index + this.timestamp + this.pHash + JSON.stringify(this.data)).toString();
     }
 }
 
@@ -67,7 +67,7 @@ class Blockchain{
      * creates the very first block
      * @returns {Block}
      */
-    createGenesisBlock = () => {
+    createGenesisBlock () {
         return new Block(0, "21/5/2018", "The very fisrt block", "0");
     }
 
@@ -76,7 +76,7 @@ class Blockchain{
      * getter for the latest block of the chain attribute
      * @returns The last block itself
      */
-    getLatestBlock = () => {
+    getLatestBlock () {
         return this.chain[this.chain.length-1];
     }
 
@@ -85,7 +85,7 @@ class Blockchain{
      * Adding neww block to the chain.
      * @param newBlock
      */
-    addBlock = (newBlock) => {
+    addBlock (newBlock){
         /**
          * For that, it will firstly retrieve the hash of the latest block
          */
@@ -100,4 +100,22 @@ class Blockchain{
     }
 
 }
+
+
+
+//TESTING THE BLOCKCHAIN
+const mantovacoin = new Blockchain(); // instance
+
+// adding blocks into it;
+
+mantovacoin.addBlock(new Block(1, "28/1/2015", { transfered: 4}));
+mantovacoin.addBlock(new Block(2, "28/1/2015", { transfered: 15}));
+mantovacoin.addBlock(new Block(3, "28/1/2015", { transfered: 50}));
+mantovacoin.addBlock(new Block(4, "28/1/2015", { transfered: 7}));
+
+
+//printing to console:
+console.log(JSON.stringify(mantovacoin, null, 4));
+
+
 
