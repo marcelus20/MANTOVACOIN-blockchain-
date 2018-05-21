@@ -1,5 +1,5 @@
 /**
- * Project: MANTOVACOIN
+ * Project: MANTOVACOIN - Blockchain-
  * Author: Felipe Mantovani
  * Date: 21/5/2018
  */
@@ -152,16 +152,19 @@ mantovacoin.addBlock(new Block(4, "28/1/2015", { transfered: 7}));
 //printing to console:
 console.log(JSON.stringify(mantovacoin, null, 4));
 
-console.log("IS MANTOVACOIN VALID "+mantovacoin.isValid()); // should be true
+console.log("IS MANTOVACOIN VALID? "+mantovacoin.isValid()); // should be true
 
 //TAMPERING/MODIFYING BLOCK first block
+
+//for tampering the blocks, it will be changed the data, for example, from 4, it will be transfered 10
+//which is a fraud, after this change, the block should not be valid, then false.
 mantovacoin.chain[1].data = {transfered: 10};
 
 //printing the blockchain tampered
 console.log(JSON.stringify(mantovacoin, null, 4));
 
 
-console.log("IS MANTOVACOIN VALID "+mantovacoin.isValid()); // shoould be false
+console.log("IS MANTOVACOIN VALID?"+mantovacoin.isValid()); // shoould be false
 
 
 
