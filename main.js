@@ -8,9 +8,8 @@
 /**
 The Block class will have the following attributes: an Index, timestamp, data and pHash.
 
- The index just represents the id of that block. When more blocks are created, the ID will increment.
  The timestamp is the date when the block is created and validated.
- data is the data itself, it could be a transaction, or a contract, I still do not know what this block chain
+ transactions will store the transaction between to public address wallets.
  will be about.
  the pHash stands for Previous Hash. As this is a block chain, the hash of the current block is related to the previous
   hash, so the hash of the previous block should be passed as parameter
@@ -23,12 +22,25 @@ The Block class will have the following attributes: an Index, timestamp, data an
 const SHA256 = require('crypto-js/sha256');
 
 
+/**
+ * The transaction class  will be made of 2 public address, the Start address and Destination address, and the value of
+ * the transaction
+ *
+ */
+
+class Transaction{
+   constructor(startAddress, destinationAddress, amount){
+       this.startAddress = startAddress;
+       this.destinationAddress = destinationAddress;
+       this.amount = amount;
+   }
+}
+
 
 class Block{
-    constructor(index, timestamp, data, pHash = ''){
-        this.index = index;
+    constructor(timestamp, transactions, pHash = ''){
         this.timestamp = timestamp;
-        this.data = data;
+        this.transactions = transactions;
         this.pHash = pHash;
         this.hash = this.createHash();
         this.nonce = 0; // the only value allowed to change in order to mine the block;
@@ -46,7 +58,7 @@ class Block{
          * in order to get the string vertion of the JSON stringfy, it will be called toSitring, cause
          * I want the SHA256 to hash a string, not a object.
          */
-        return SHA256(this.index + this.timestamp + this.pHash + JSON.stringify(this.data) + this.nonce).toString();
+        return SHA256(this.index + this.timestamp + this.pHash + JSON.stringify(this.transactions) + this.nonce).toString();
     }
 
     /**
