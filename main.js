@@ -29,10 +29,10 @@ const SHA256 = require('crypto-js/sha256');
  */
 
 class Transaction{
-   constructor(startAddress, destinationAddress, amount){
+   constructor(startAddress, destinationAddress, value){
        this.startAddress = startAddress;
        this.destinationAddress = destinationAddress;
-       this.amount = amount;
+       this.value = value;
    }
 }
 
@@ -58,7 +58,7 @@ class Block{
          * in order to get the string vertion of the JSON stringfy, it will be called toSitring, cause
          * I want the SHA256 to hash a string, not a object.
          */
-        return SHA256(this.index + this.timestamp + this.pHash + JSON.stringify(this.transactions) + this.nonce).toString();
+        return SHA256(this.timestamp + this.pHash + JSON.stringify(this.transactions) + this.nonce).toString();
     }
 
     /**
@@ -94,6 +94,12 @@ class Blockchain{
          * @type {number}
          */
         this.difficulty = 5;
+
+        //PENDING TRANSACTIONS
+        this.pendingTransactions = [];
+
+        //reward for the miner
+        this.reward = 100;
     }
 
 
@@ -102,7 +108,7 @@ class Blockchain{
      * @returns {Block}
      */
     createGenesisBlock () {
-        return new Block(0, "21/5/2018", "The very fisrt block", "0");
+        return new Block("21/5/2018", new Transaction("","",0));
     }
 
 
@@ -116,23 +122,69 @@ class Blockchain{
 
 
     /**
-     * Adding neww block to the chain.
-     * @param newBlock
+     * The parameter bellow indicates where the blockchain should transfer the creation of MANTOVACOINS by a given address
+     * @param winnerMinerAddress
      */
-    addBlock (newBlock){
-        /**
-         * For that, it will firstly retrieve the hash of the latest block
-         */
-        newBlock.pHash = this.getLatestBlock().hash;
+    miningPendingTransactions(winnerMinerAddress){
+
+        //creating instance of new block
+        let block = new Block(Date.now(), this.pendingTransactions);
+        block.pHash = this.getLatestBlock().hash;//pointing to the previous block
+        block.mineBlock(this.difficulty);
+
+        console.log("Block mined");
+        console.log(block.hash);
+        console.log("\n");
+        this.chain.push(block);
+
+        //reseting pending transactions property with the transaction of the reward
+        //the first parameter is null cause the system itself is creating cois to transfer to the miner,
+        //it is not comming from anywhere else, so there is no start address;
+        this.pendingTransactions = [new Transaction(null, winnerMinerAddress, this.reward)];
+    }
+
+    /**
+     * method will just add the transaction to the array of pending transactions
+     * @param transaction
+     */
+    createTransactioon(transaction){
+        this.pendingTransactions.push(transaction);
+
+    }
 
 
-        //updating the hash
-        newBlock.mineBlock(this.difficulty);
+    /**
+     * This method will loop over the whole blockchain and check transactions involving the address parameter
+     * and come up with the balance value by checking the value of the transactions of that address.
+     * @param address
+     */
+    checkBalanceOfTheAddress(address){
+        let balance = 0;
 
-        //finally adding to the chain:
-        this.chain.push(newBlock);
+        for(const block of this.chain){//iterating all blocks in the blockchain
 
-        console.log("Block Mined! hash:" + newBlock.hash);
+
+
+            for (let i = 0; i < block.transactions.length; i++){//iterating the transactions of each block
+
+                const trans = block.transactions[i];
+
+
+                if(address === trans.destinationAddress){ // if you receive money, add to the balance
+                    balance += trans.value;
+                }
+
+                if(address === trans.startAddress){// if you gave money, discount from the balance
+                    balance -= trans.value;
+                }
+
+            }
+
+
+
+        }
+        return balance;
+
     }
 
 
@@ -177,19 +229,58 @@ class Blockchain{
 //TESTING THE BLOCKCHAIN
 const mantovacoin = new Blockchain(); // instance
 
-// adding blocks into it;
 
-//proof of work test: CHANGE THE DIFFICULTY IN ORDER TO SEE THE DIFFERENCE IN TIME.
+//DEFINING THE PUBLIC WALLETS
+const address1 = "address1";
+const address2 = "address2";
+const minerAddress = "felipe";
 
 
-console.log("Mining block");
-mantovacoin.addBlock(new Block(1, "28/1/2015", { transfered: 4}));
-console.log("Mining block");
-mantovacoin.addBlock(new Block(2, "28/1/2015", { transfered: 15}));
-console.log("Mining block");
-mantovacoin.addBlock(new Block(3, "28/1/2015", { transfered: 50}));
-console.log("Mining block");
-mantovacoin.addBlock(new Block(4, "28/1/2015", { transfered: 7}));
+//making some transactions
+//address1 transfer 100 to address 2
+mantovacoin.createTransactioon(new Transaction(address1, address2, 100));
+//address 2 transfer 20 to address1
+mantovacoin.createTransactioon(new Transaction(address2, address1, 2));
+
+
+
+//mining the block
+console.log("Mining Block...")
+mantovacoin.miningPendingTransactions(minerAddress); // reward goes to felipe, the minerAddress
+
+//felipe transfer 50 to address2
+mantovacoin.createTransactioon(new Transaction(minerAddress, address2, 50));
+
+
+//mining the second block:
+mantovacoin.miningPendingTransactions(minerAddress);
+
+
+//checking the balance of address2:
+console.log("The address2 wallet balance is: "+mantovacoin.checkBalanceOfTheAddress(address2)+" mantovacoins");
+//checking the balance of address2:
+console.log("The miner Address wallet balance is: "+mantovacoin.checkBalanceOfTheAddress(minerAddress)+" mantovacoins");
+//at this point miner address value should be 150 because he has mined 2 blocks so far. it will show though just 50
+//cause the value will be updated on the next mining.
+
+
+//checking integrity of the block, it should be true
+console.log("This blockchain has not been tampered: "+mantovacoin.isValid());
+
+/*<-uncomment this to TAMPER with the blockchain
+//tampering the blockchain:
+//address 2 will change the first transaction of the second block
+mantovacoin.chain[1].transactions[0].value = 1000; // wow, it made address2 rich
+
+//checking integrity of the block: it should be false
+console.log("This blockchain has not been tampered: "+mantovacoin.isValid());
+*///*<-uncomment this to TAMPER with the blockchain
+
+//printing the whole blockchain
+console.log(JSON.stringify(mantovacoin.chain, null, 4));
+
+
+
 
 
 
