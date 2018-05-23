@@ -12,9 +12,9 @@ This simulates a blockchain and its features such as:
 
 </ul>
 
-<h3>How instantiate the the blockchain</h3>
+<h3>How to instantiate the the blockchain</h3>
 <p background="grey">
-<code>mantovaCoin = new Blockchain();</code>
+<code>const mantovaCoin = new Blockchain();</code>
 </p>
 
 <h3> Making transactions </h3>
