@@ -93,7 +93,7 @@ class Blockchain{
          * THe higher the difficulty value, the more time it will take to mine the block
          * @type {number}
          */
-        this.difficulty = 5;
+        this.difficulty = 6;
 
         //PENDING TRANSACTIONS
         this.pendingTransactions = [];
@@ -147,7 +147,7 @@ class Blockchain{
      * method will just add the transaction to the array of pending transactions
      * @param transaction
      */
-    createTransactioon(transaction){
+    createTransaction(transaction){
         this.pendingTransactions.push(transaction);
 
     }
@@ -238,9 +238,9 @@ const minerAddress = "felipe";
 
 //making some transactions
 //address1 transfer 100 to address 2
-mantovacoin.createTransactioon(new Transaction(address1, address2, 100));
+mantovacoin.createTransaction(new Transaction(address1, address2, 100));
 //address 2 transfer 20 to address1
-mantovacoin.createTransactioon(new Transaction(address2, address1, 2));
+mantovacoin.createTransaction(new Transaction(address2, address1, 2));
 
 
 
@@ -249,7 +249,7 @@ console.log("Mining Block...")
 mantovacoin.miningPendingTransactions(minerAddress); // reward goes to felipe, the minerAddress
 
 //felipe transfer 50 to address2
-mantovacoin.createTransactioon(new Transaction(minerAddress, address2, 50));
+mantovacoin.createTransaction(new Transaction(minerAddress, address2, 50));
 
 
 //mining the second block:
