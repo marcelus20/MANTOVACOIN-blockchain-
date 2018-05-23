@@ -12,6 +12,12 @@ This simulates a blockchain and its features such as:
 
 </ul>
 
+<h3>How to change the difficulty</h3>
+Go to Blockchain class and change the attribute difficulty value.
+<h1>WARNING</h1>
+It is recomended to use the difficulty level between 0 and 5, because higher than 5
+may take several minutes to mine the block and the CPU may work harder for the Hash problem solving process
+
 <h3>How to instantiate the the blockchain</h3>
 <p background="grey">
 <code>const mantovaCoin = new Blockchain();</code>
