@@ -36,4 +36,4 @@ mantovaCoin.chain[1].transactions[0].value = 8000;
 mantovaCoin.isValid should return false flag from the above line and on
 
 <h3> How to print the whole blockchain </h3>
-<code>console.log(JSON.stringify(mantovacoin.chain, null, 4));</code>
+<code>console.log(JSON.stringify(mantovaCoin.chain, null, 4));</code>
