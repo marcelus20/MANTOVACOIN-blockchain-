@@ -34,3 +34,6 @@ The minerAddress is passed as a parameter because the system will reward the min
 <h3>An example of how to tamper with a block on the blockchain</h3>
 mantovaCoin.chain[1].transactions[0].value = 8000;
 mantovaCoin.isValid should return false flag from the above line and on
+
+<h3> How to print the whole blockchain </h3>
+<code>console.log(JSON.stringify(mantovacoin.chain, null, 4));</code>
