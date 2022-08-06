@@ -2,10 +2,10 @@
 const  SHA256  = require('crypto-js/sha256');
 
 module.exports = class Block{
-    constructor(timestamp = Date.now(), previousBlockHash = ''){
+    constructor(timestamp = Date.now(), previousBlockHash = '', hash = this.createHash()){
         this.timestamp = timestamp;
         this.previousBlockHash = previousBlockHash;
-        this.hash = this.createHash();
+        this.hash = hash
         this.nonce = 0; // the only value allowed to change in order to mine the block;
     }
 

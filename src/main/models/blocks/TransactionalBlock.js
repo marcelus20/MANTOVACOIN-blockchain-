@@ -6,6 +6,7 @@ module.exports = class TransactionalBlock extends Block{
     constructor(timestamp, previousBlockHash = '', transactions = []){
         super(timestamp, previousBlockHash)
         this.transactions = transactions;
+        this.hash = this.createHash()
     }
 
     createHash(){

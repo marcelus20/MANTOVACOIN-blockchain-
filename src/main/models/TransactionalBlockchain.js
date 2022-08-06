@@ -1,7 +1,6 @@
 /**
- * The Blockchain class will be just an array of Blocks, as not blocks have been created yet,
- * the genesis block will be added manually, it will be done by a method that will be trigered if
- * The array is empty
+ * The Blockchain class will be just an array of Blocks, as the blocks have not been yet created,
+ * the genesis block will be added automatically as the first block, it will be done by the this.createGenesisBlock method.
  */
 
 const TransactionalBlock = require("./blocks/TransactionalBlock")
@@ -34,7 +33,6 @@ module.exports = class TransactionalBlockchain{
      * @returns {TransactionalBlock}
      */
     createGenesisBlock () {
-
         return new TransactionalBlock(Date.now(), '', [new Transaction("","",0)]);
     }
 
@@ -75,7 +73,7 @@ module.exports = class TransactionalBlockchain{
      */
     createTransaction(transaction){
         if(transaction instanceof Transaction)
-            if(transaction.startAddress != transaction.destinationAddress)
+            if(transaction.senderAddress != transaction.receiverAddress)
                 this.pendingTransactions.push(transaction);
     }
 
@@ -89,7 +87,7 @@ module.exports = class TransactionalBlockchain{
 
         return this.chain
             .flatMap(block=>block.transactions)
-            .filter((transaction) => transaction.destinationAddress == address)
+            .filter((transaction) => transaction.receiverAddress == address)
             .map(filteredTransaction=>filteredTransaction.value)
             .reduce((value, acc)=> value + acc, 0)
     }
@@ -104,27 +102,25 @@ module.exports = class TransactionalBlockchain{
      */
     isValid(){
         /**
-         * loop over until the end of the chain, begining from the second block
+         * loop over until the end of the chain
          */
-        
-        for(let i = 1; i < this.chain.length; i++){
-            const previousBlock = this.chain[i-1];
-            const currentBlock = this.chain[i];
+        return this.chain.map((block, i)=>{
+            // if block is the genesis block
+            if(i == 0){
 
-            // if the previous block does not point to the actual, then it is not a valid block
-            if(previousBlock.hash !== currentBlock.previousBlockHash){
-                return false;
+                return block.hash === block.createHash()
+            }else{
+                const previousBlock = this.chain[i-1]
+                const currentBlock = block
+
+                // if the previous block does not point to the actual, or createHash and current block hash don't match
+                if(previousBlock.hash !== currentBlock.previousBlockHash || currentBlock.hash !== currentBlock.createHash()){
+                    return false;
+                }
+                return true;
             }
-
-            // if the block has been tampered, the currentBlock.hash won be the same as creating a new,
-            //cause any information modified changed substantially the hash
-            if(currentBlock.hash !== currentBlock.createHash()){
-                return false;
-            }
-        }
-
-        //if loop is finished and does not encounter anything wrong, then block is valid
-        return true;
+            
+        }).reduce((acc, valid)=>acc && valid, true)
     }
 
     /**
@@ -132,18 +128,14 @@ module.exports = class TransactionalBlockchain{
      * @returns 
      */
     detectWhichBlockIsInvalid(){
-        for(let i = 1; i < this.chain.length; i++){
+        for(let i = 0; i < this.chain.length; i++){
+            if(i == 0)
+                return this.chain[i].hash === this.chain[i].createHash()
             const previousBlock = this.chain[i-1];
             const currentBlock = this.chain[i];
 
-            // if the previous block does not point to the actual, then it is not a valid block
-            if(previousBlock.hash !== currentBlock.previousBlockHash){
-                return i;
-            }
-
-            // if the block has been tampered, the currentBlock.hash won be the same as creating a new,
-            //cause any information modified changed substantially the hash
-            if(currentBlock.hash !== currentBlock.createHash()){
+            // if the previous block does not point to the actual, or if current hash and current create hash don't match.
+            if(previousBlock.hash !== currentBlock.previousBlockHash || currentBlock.hash !== currentBlock.createHash()){
                 return i;
             }
         }
@@ -155,8 +147,12 @@ module.exports = class TransactionalBlockchain{
      * Mines the block in the position given. It will only mine if the previous block is valid. 
      */
     mineSpecificBlock(blockPosition = 1){
-        const block = this.chain[blockPosition]
-        const toMineBlock = new TransactionalBlock(block.timestamp, this.chain[blockPosition-1].hash, block.transactions);
+        const block = this.chain[blockPosition < 0 ? 0 : blockPosition]
+        const toMineBlock = new TransactionalBlock(
+            block.timestamp,
+            blockPosition <= 0? '' : this.chain[blockPosition-1].hash,
+            block.transactions
+        );
         toMineBlock.mine(this.difficulty);
         this.chain[blockPosition] = toMineBlock
     }

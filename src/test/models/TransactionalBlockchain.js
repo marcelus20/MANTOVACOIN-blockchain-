@@ -262,3 +262,134 @@ describe("TransactionalBlockchain",()=>{
         })
     })
 })
+
+describe("TransactionalBlockchain",()=>{
+    describe("isValid", ()=>{
+        it("Should return true when tampered with in the genesis block as long as each block gets re-validated/mined again until the end of the chain.", ()=>{
+            // Given Blockchain
+            const blockchain = new TransactionalBlockchain()
+            blockchain.difficulty = 1
+
+            // When
+            blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 20))
+            blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 5))
+            blockchain.miningPendingTransactions("minerAddress1")
+            blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 50))
+            blockchain.miningPendingTransactions("minerAddress1")
+            blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 50))
+            blockchain.miningPendingTransactions("minerAddress1")
+
+            // Changing/tampering the value of the transaction of the genesis block
+
+            blockchain.chain[0].transactions[0].value = 500
+
+            // Now mining each block one by one. 
+            blockchain.mineSpecificBlock(0);
+            blockchain.mineSpecificBlock(1);
+            blockchain.mineSpecificBlock(2);
+            blockchain.mineSpecificBlock(3);
+            
+            // Then
+            assert.equal(blockchain.isValid(), true)
+        })
+    })
+})
+
+describe("TransactionalBlockchain",()=>{
+    describe("isValid", ()=>{
+        it("If Genesis Block has been tampered with, there is no use of mining from the second block and on until the end of the chain, without mining the genesis block beforehand.", ()=>{
+            // Given Blockchain
+            const blockchain = new TransactionalBlockchain()
+            blockchain.difficulty = 1
+
+            // When
+            blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 20))
+            blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 5))
+            blockchain.miningPendingTransactions("minerAddress1")
+            blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 50))
+            blockchain.miningPendingTransactions("minerAddress1")
+            blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 50))
+            blockchain.miningPendingTransactions("minerAddress1")
+
+            // Changing/tampering the value of the transaction of the genesis block
+
+            blockchain.chain[0].transactions[0].value = 500
+
+            // Now mining each block one by one, ignoring genesis. 
+            blockchain.mineSpecificBlock(1);
+            blockchain.mineSpecificBlock(2);
+            blockchain.mineSpecificBlock(3);
+            
+            // Then
+            assert.equal(blockchain.isValid(), false)
+        })
+    })
+})
+
+describe("TransactionalBlockchain",()=>{
+    describe("mineSpecificBlock",()=>{
+        it("Should set the previousBlockHash to an empty string if the parameter value is lower than 0 (which indicates that the block is the genesis block)",()=>{
+            //given 
+            const blockchain = new TransactionalBlockchain()
+            const emptyString = blockchain.chain[0].previousBlockHash
+            // when
+            blockchain.mineSpecificBlock(-10)
+            // Then
+            assert.equal(blockchain.chain[0].previousBlockHash, emptyString)
+        })
+    })
+})
+
+describe("TransactionalBlockchain",()=>{
+    describe("mineSpecificBlock",()=>{
+        it("Should set the previousBlockHash to an empty string if the parameter value is 0 (which defaults to genesis block)",()=>{
+            //given 
+            const blockchain = new TransactionalBlockchain()
+            const emptyString = blockchain.chain[0].previousBlockHash
+            // when
+            blockchain.mineSpecificBlock(0)
+            // Then
+            assert.equal(blockchain.chain[0].previousBlockHash, emptyString)
+        })
+    })
+})
+
+describe("TransactionalBlockchain",()=>{
+    describe("isValid",()=>{
+        it("Should return false when the genesis block has been tampered with.",()=>{
+            //given 
+            const blockchain = new TransactionalBlockchain()
+
+            // when
+            blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 20))
+            blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 5))
+            blockchain.miningPendingTransactions("minerAddress1")
+
+            // Tampering with genesis block
+            blockchain.chain[0].transactions.push(new Transaction("dummyAddress1", "dummyAddress2", 200))
+
+            // Then
+            assert.equal(blockchain.isValid(), false)
+        })
+    })
+})
+
+describe("TransactionalBlockchain",()=>{
+    describe("detectWhichBlockIsInvalid",()=>{
+        it("Should return 0 when genesis block got tampered with.",()=>{
+            //given 
+            const blockchain = new TransactionalBlockchain()
+
+            // when
+            blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 20))
+            blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 5))
+            blockchain.miningPendingTransactions("minerAddress1")
+
+            // Tampering with genesis block
+            blockchain.chain[0].transactions.push(new Transaction("dummyAddress1", "dummyAddress2", 200))
+
+            // Then
+            assert.equal(blockchain.detectWhichBlockIsInvalid(), 0)
+        })
+    })
+})
