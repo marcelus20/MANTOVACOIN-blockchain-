@@ -9,21 +9,24 @@ const Transaction = require("./Transaction")
 
 module.exports = class TransactionalBlockchain{
 
-    constructor(){
-        this.chain = [this.createGenesisBlock()];
+    constructor(chain = [], difficulty = 2, pendingTransactions = [], reward = 100){
+        this.chain = chain
 
         /**
          * The time of the proof of work will depend on the difficulty attribute
          * THe higher the difficulty value, the more time it will take to mine the block
          * @type {number}
          */
-        this.difficulty = 2;
+        this.difficulty = difficulty;
 
         //PENDING TRANSACTIONS
-        this.pendingTransactions = [];
+        this.pendingTransactions = pendingTransactions
 
         //reward for the miner
-        this.reward = 100;
+        this.reward = reward
+
+        // pushing the genesis block to this.chain
+        this.chain.push(this.createGenesisBlock())
     }
 
      /**
@@ -122,8 +125,6 @@ module.exports = class TransactionalBlockchain{
 
         //if loop is finished and does not encounter anything wrong, then block is valid
         return true;
-    
-    
     }
 
     /**
@@ -155,7 +156,7 @@ module.exports = class TransactionalBlockchain{
      */
     mineSpecificBlock(blockPosition = 1){
         const block = this.chain[blockPosition]
-        const toMineBlock = new TransactionalBlock(block.timestamp, block.previousBlockHash, block.pendingTransactions);
+        const toMineBlock = new TransactionalBlock(block.timestamp, this.chain[blockPosition-1].hash, block.transactions);
         toMineBlock.mine(this.difficulty);
         this.chain[blockPosition] = toMineBlock
     }

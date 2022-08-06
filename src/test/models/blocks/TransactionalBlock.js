@@ -37,20 +37,6 @@ describe("TransactionalBlock",()=>{
     })
 })
 
-describe("TransactionalBlock",()=>{
-    describe("mine function", ()=>{
-        it("Should have a the value greater than 0 when block finishes its mining algorithm when difficulty is greater than 0.", ()=>{
-            // Given Block
-            const block = new TransactionalBlock();
-
-            // When
-            block.mine(1)
-            
-            // Then
-            assert.equal(block.nonce > 0, true)
-        })
-    })
-})
 
 describe("TransactionalBlock",()=>{
     describe("mine function", ()=>{

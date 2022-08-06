@@ -232,32 +232,33 @@ describe("TransactionalBlockchain",()=>{
     })
 })
 
-// describe("TransactionalBlockchain",()=>{
-//     describe("isValid", ()=>{
-//         it("Should return true when tampered with as long as each block gets re-validated/mined again.", ()=>{
-//             // Given Blockchain
-//             const blockchain = new TransactionalBlockchain()
+describe("TransactionalBlockchain",()=>{
+    describe("isValid", ()=>{
+        it("Should return true when tampered with as long as each block gets re-validated/mined again.", ()=>{
+            // Given Blockchain
+            const blockchain = new TransactionalBlockchain()
+            blockchain.difficulty = 1
 
-//             // When
-//             blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 20))
-//             blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 5))
-//             blockchain.miningPendingTransactions("minerAddress1")
-//             blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 50))
-//             blockchain.miningPendingTransactions("minerAddress1")
-//             blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 50))
-//             blockchain.miningPendingTransactions("minerAddress1")
+            // When
+            blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 20))
+            blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 5))
+            blockchain.miningPendingTransactions("minerAddress1")
+            blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 50))
+            blockchain.miningPendingTransactions("minerAddress1")
+            blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 50))
+            blockchain.miningPendingTransactions("minerAddress1")
 
-//             // Changing/tampering the value of the second transaction of the first block to 500
+            // Changing/tampering the value of the second transaction of the first block to 500
 
-//             blockchain.chain[1].transactions[1].value = 500
+            blockchain.chain[1].transactions[1].value = 500
 
-//             // Now mining each block one by one. 
-//             blockchain.mineSpecificBlock(0);
-//             blockchain.mineSpecificBlock(1);
-
+            // Now mining each block one by one. 
+            blockchain.mineSpecificBlock(1);
+            blockchain.mineSpecificBlock(2);
+            blockchain.mineSpecificBlock(3);
             
-//             // Then
-//             assert.equal(2, blockchain.detectWhichBlockIsInvalid())
-//         })
-//     })
-// })
+            // Then
+            assert.equal(blockchain.isValid(), true)
+        })
+    })
+})
