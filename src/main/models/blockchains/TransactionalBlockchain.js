@@ -27,7 +27,16 @@ module.exports = class TransactionalBlockchain extends Blockchain{
      * @returns {TransactionalBlock}
      */
     createGenesisBlock () {
-        return new TransactionalBlock(Date.now(), '', [new Transaction("","",0)]);
+        return new TransactionalBlock()
+            .withTransactions(
+                [new Transaction()
+                .withSenderAddress("")
+                .withReceiverAddress("")
+                .withValue(0)])
+            .withTimestamp(Date.now())
+            .withNonce(0)
+            .withPreviousBlockHash('')
+            .withHash();
     }
 
 
@@ -39,16 +48,24 @@ module.exports = class TransactionalBlockchain extends Blockchain{
 
         if(this.pendingTransactions.length > 0){
             //creating instance of new block
-            let block = new TransactionalBlock(Date.now(), '', this.pendingTransactions);
-            block.previousBlockHash = this.getLatestBlock().hash;//pointing to the previous block
-            block.mine(this.difficulty);
+            const block = new TransactionalBlock()
+                .withTimestamp(Date.now())
+                .withPreviousBlockHash(this.getLatestBlock().hash)
+                .withNonce(0)
+                .withTransactions(this.pendingTransactions)
+                .withHash();
 
-            this.chain.push(block);
+            const minedBlock = block.mine(this.difficulty);
+
+            this.chain.push(minedBlock);
 
             //reseting pending transactions property with the transaction of the reward
             //the first parameter is null cause the system itself is creating cois to transfer to the miner,
             //it is not comming from anywhere else, so there is no start address;
-            this.pendingTransactions = [new Transaction(null, winnerMinerAddress, this.reward)];
+            this.pendingTransactions = [new Transaction()
+                .withSenderAddress(null)
+                .withReceiverAddress(winnerMinerAddress)
+                .withValue(this.reward)];
         }
     }
 
@@ -84,12 +101,14 @@ module.exports = class TransactionalBlockchain extends Blockchain{
      */
     mineSpecificBlock(blockPosition = 1){
         const block = this.chain[blockPosition < 0 ? 0 : blockPosition]
-        const toMineBlock = new TransactionalBlock(
-            block.timestamp,
-            blockPosition <= 0? '' : this.chain[blockPosition-1].hash,
-            block.transactions
-        );
-        toMineBlock.mine(this.difficulty);
-        this.chain[blockPosition] = toMineBlock
+        const toMineBlock = new TransactionalBlock()
+            .withTimestamp(block.timestamp)
+            .withPreviousBlockHash(blockPosition <= 0? '' : this.chain[blockPosition-1].hash)
+            .withNonce(block.nonce)
+            .withTransactions(block.transactions)
+            .withHash()
+        
+        const minedBlock = toMineBlock.mine(this.difficulty);
+        this.chain[blockPosition] = minedBlock
     }
 }

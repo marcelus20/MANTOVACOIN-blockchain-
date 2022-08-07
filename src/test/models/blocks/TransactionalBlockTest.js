@@ -24,12 +24,24 @@ describe("TransactionalBlock",()=>{
             // Given 
             const sameDateForBothBlocks = Date.now()
             const samePreviousHashForBothBlocks = ""
-            const block1 = new TransactionalBlock(sameDateForBothBlocks, samePreviousHashForBothBlocks);
-            const block2 = new TransactionalBlock(sameDateForBothBlocks, samePreviousHashForBothBlocks, [new Transaction("address1", "address2", 10)])
+            const sameNonceForBothBlocks = 0
+            const block1 = new TransactionalBlock()
+                .withTimestamp(sameDateForBothBlocks)
+                .withPreviousBlockHash(samePreviousHashForBothBlocks)
+                .withNonce(sameNonceForBothBlocks)
+                .withTransactions([])
+            const block2 = new TransactionalBlock()
+                .withTimestamp(sameDateForBothBlocks)
+                .withPreviousBlockHash(samePreviousHashForBothBlocks)
+                .withNonce(sameNonceForBothBlocks)
+                .withTransactions([new Transaction()
+                    .withSenderAddress("address1")
+                    .withReceiverAddress("address2")
+                    .withValue(10)])
 
             // When
-            const hashFromBlock1 = block1.createHash()
-            const hashFromBlock2 = block2.createHash()
+            const hashFromBlock1 = block1.withHash().hash
+            const hashFromBlock2 = block2.withHash().hash
             
             // Then
             assert.notEqual(hashFromBlock1, hashFromBlock2)
@@ -60,10 +72,10 @@ describe("TransactionalBlock",()=>{
             const block = new TransactionalBlock();
 
             // When
-            block.mine(3)
+            const minedBlock = block.mine(3)
             
             // Then
-            assert.equal(block.hash.startsWith("000"), true)
+            assert.equal(minedBlock.hash.startsWith("000"), true)
         })
     })
 })

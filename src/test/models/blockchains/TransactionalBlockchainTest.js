@@ -1,6 +1,7 @@
 var assert = require('assert');
 const Transaction = require('../../../main/models/Transaction');
 const TransactionalBlockchain = require('../../../main/models/blockchains/TransactionalBlockchain');
+const TransactionalBlock = require('../../../main/models/blocks/TransactionalBlock');
 
 describe("TransactionalBlockchain",()=>{
     describe("constructor", ()=>{
@@ -223,9 +224,21 @@ describe("TransactionalBlockchain",()=>{
             blockchain.miningPendingTransactions("minerAddress1")
 
             // Changing/tampering the value of the second transaction of the second block to 500
-            blockchain.chain[1].transactions[1].value = 500
+            const currentBlock = {...blockchain.chain[1]}
+            const transactions = [...currentBlock.transactions]
+            // Tampering transaction 2
+            transactions[1].value = 500
+            const tamperedBlock = new TransactionalBlock()
+                .withTimestamp(currentBlock.timestamp)
+                .withPreviousBlockHash(currentBlock.previousBlockHash)
+                .withHash(currentBlock.hash)
+                .withNonce(currentBlock.nonce)
+                .withTransactions([...transactions])
 
+            // assigning tampered block back to blockchain
+            blockchain.chain[1] = tamperedBlock
             
+
             // Then
             assert.equal(1, blockchain.detectWhichBlockIsInvalid())
         })

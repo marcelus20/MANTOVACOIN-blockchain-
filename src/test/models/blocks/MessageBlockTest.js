@@ -1,4 +1,5 @@
 var assert = require('assert');
+const Block = require('../../../main/models/blocks/Block');
 const MessageBlock = require('../../../main/models/blocks/MessageBlock');
 
 describe("MessageBlock",()=>{
@@ -23,15 +24,55 @@ describe("MessageBlock",()=>{
             // Given 
             const sameDateForBothBlocks = Date.now()
             const samePreviousHashForBothBlocks = ""
-            const block1 = new MessageBlock(sameDateForBothBlocks, samePreviousHashForBothBlocks);
-            const block2 = new MessageBlock(sameDateForBothBlocks, samePreviousHashForBothBlocks, "different message here")
+            const sameNonceForBothBlocks = 0
+            const block1 = new MessageBlock()
+                .withTimestamp(sameDateForBothBlocks)
+                .withPreviousBlockHash(samePreviousHashForBothBlocks)
+                .withNonce(sameNonceForBothBlocks)
+            const block2 = new MessageBlock()
+                .withTimestamp(sameDateForBothBlocks)
+                .withPreviousBlockHash(samePreviousHashForBothBlocks)
+                .withNonce(sameNonceForBothBlocks)
+                .withMessage("different message here")
 
             // When
-            const hashFromBlock1 = block1.createHash()
-            const hashFromBlock2 = block2.createHash()
+            const hashFromBlock1 = block1.withHash().hash
+            const hashFromBlock2 = block2.withHash().hash
             
             // Then
             assert.notEqual(hashFromBlock1, hashFromBlock2)
+        })
+    })
+})
+
+describe("MessageBlock", ()=>{
+    describe("createHash", ()=>{
+        it("Should create a different hash from Block.prototype.createHash even when the message contains an empty string and all other fields are the same.", ()=>{
+            // Given
+            const now = Date.now()
+            const prevHash = ''
+            const nonce = 0
+
+            const block = new Block()
+                .withTimestamp(now)
+                .withPreviousBlockHash(prevHash)
+                .withNonce(nonce)
+                .withHash()
+
+            const messageBlock = new MessageBlock()
+                .withTimestamp(now)
+                .withPreviousBlockHash(prevHash)
+                .withNonce(nonce)
+                .withMessage('')
+                .withHash()
+
+            // When 
+            const blockHash = block.hash
+            const messageBlockHash = messageBlock.hash
+
+
+            // Then
+            assert.notEqual(blockHash, messageBlockHash)
         })
     })
 })

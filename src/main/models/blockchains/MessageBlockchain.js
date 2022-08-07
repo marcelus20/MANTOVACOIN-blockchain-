@@ -19,17 +19,27 @@ module.exports = class MessageBlockchain extends Blockchain{
      * @returns {MessageBlock}
      */
     createGenesisBlock () {
-        return new MessageBlock(Date.now(), '', "This is the genesis block!");
+        return new MessageBlock()
+            .withTimestamp(Date.now())
+            .withPreviousBlockHash('')
+            .withNonce(0)
+            .withMessage("This is the genesis block!")
+            .withHash();
     }
 
 
 
     miningPendingMessage(){
-        let block = new MessageBlock(Date.now(), '', this.pendingMessage);
-        block.previousBlockHash = this.getLatestBlock().hash;//pointing to the previous block
-        block.mine(this.difficulty);
+        const block = new MessageBlock()
+            .withTimestamp(Date.now())
+            .withPreviousBlockHash(this.getLatestBlock().hash)
+            .withNonce(0)
+            .withMessage(this.pendingMessage)
+            .withHash();
 
-        this.chain.push(block);
+        
+        const minedBlock = block.mine(this.difficulty);
+        this.chain.push(minedBlock);
 
         this.pendingMessage = "";        
     }
@@ -48,12 +58,14 @@ module.exports = class MessageBlockchain extends Blockchain{
      */
     mineSpecificBlock(blockPosition = 1){
         const block = this.chain[blockPosition < 0 ? 0 : blockPosition]
-        const toMineBlock = new MessageBlock(
-            block.timestamp,
-            blockPosition <= 0? '' : this.chain[blockPosition-1].hash,
-            block.message
-        );
-        toMineBlock.mine(this.difficulty);
-        this.chain[blockPosition] = toMineBlock
+        const toMineBlock = new MessageBlock()
+            .withTimestamp(block.timestamp)
+            .withPreviousBlockHash(blockPosition <= 0? '' : this.chain[blockPosition-1].hash)
+            .withNonce(block.nonce)
+            .withMessage(block.message)
+            .withHash()
+
+        const minedBlock = toMineBlock.mine(this.difficulty)
+        this.chain[blockPosition] = minedBlock
     }
 }

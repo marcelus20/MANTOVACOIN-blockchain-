@@ -1,5 +1,6 @@
 var assert = require('assert');
 const MessageBlockchain = require('../../../main/models/blockchains/MessageBlockchain');
+const MessageBlock = require('../../../main/models/blocks/MessageBlock');
 
 describe("MessageBlockchain",()=>{
     describe("constructor", ()=>{
@@ -66,7 +67,7 @@ describe("MessageBlockchain",()=>{
 
             
             // Then
-            assert.equal(blockchain.isValid(), true)
+            assert.equal(true, blockchain.isValid())
         })
     })
 })
@@ -110,8 +111,16 @@ describe("MessageBlockchain",()=>{
             blockchain.createMessage("another dummy message here in the third block")
             blockchain.miningPendingMessage()
 
-            // Tampering with the first block after genesis: 
-            blockchain.chain[1].message = "Tampering with Dummy Message."
+            // Tampering with the first block after genesis:
+            const currentBlock = blockchain.chain[1]
+            const tamperedBlock = new MessageBlock()
+                .withTimestamp(currentBlock.timestamp)
+                .withPreviousBlockHash(currentBlock.previousBlockHash)
+                .withHash(currentBlock.hash)
+                .withNonce(currentBlock.nonce)
+                .withMessage("Tampering with Dummy Message.")
+
+            blockchain.chain[1] = tamperedBlock
 
             // Mining each block until the end of the chain.
             blockchain.mineSpecificBlock(1)
@@ -119,7 +128,7 @@ describe("MessageBlockchain",()=>{
             blockchain.mineSpecificBlock(3)
             
             // Then
-            assert.equal(blockchain.isValid(), true)
+            assert.equal(true, blockchain.isValid())
         })
     })
 })
@@ -198,7 +207,17 @@ describe("MessageBlockchain",()=>{
             blockchain.miningPendingMessage()
 
             // Tampering with genesis block
-            blockchain.chain[0].message = "tampered dummy message"
+            // blockchain.chain[0].message = "tampered dummy message"
+            const genesisBlock = {...blockchain.chain[0]}
+            const tamperedBlock = new MessageBlock()
+                .withTimestamp(genesisBlock.timestamp)
+                .withPreviousBlockHash(genesisBlock.previousBlockHash)
+                .withHash(genesisBlock.hash)
+                .withNonce(genesisBlock.nonce)
+                .withMessage("tampered dummy message")
+
+                blockchain.chain[0] = tamperedBlock
+
 
             // Then
             assert.equal(blockchain.detectWhichBlockIsInvalid(), 0)

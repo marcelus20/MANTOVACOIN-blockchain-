@@ -10,4 +10,16 @@ module.exports = class Transaction{
         this.receiverAddress = receiverAddress;
         this.value = value;
     }
+
+    withSenderAddress(senderAddress){
+        return new Transaction(senderAddress, this.receiverAddress, this.value)
+    }
+
+    withReceiverAddress(receiverAddress){
+        return new Transaction(this.senderAddress, receiverAddress, this.value)
+    }
+
+    withValue(value){
+        return new Transaction(this.senderAddress, this.receiverAddress, value)
+    }
  }

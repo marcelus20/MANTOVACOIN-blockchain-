@@ -40,10 +40,10 @@ describe("Block",()=>{
             const block = new Block();
 
             // When
-            block.mine(3)
+            const minedBlock = block.mine(3)
             
             // Then
-            assert.equal(block.hash.startsWith("000"), true)
+            assert.equal(minedBlock.hash.startsWith("000"), true)
         })
     })
 })
