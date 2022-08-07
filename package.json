@@ -1,5 +1,5 @@
 {
-  "name": "blockchain-simulator",
+  "name": "mantovacoin",
   "version": "1.0.0-SNAPSHOT",
   "description": "Basic Blockchain Modules",
   "main": "index.js",
