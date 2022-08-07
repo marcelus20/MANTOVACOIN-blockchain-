@@ -3,14 +3,19 @@
  * Author: Felipe Mantovani
  * Date: 21/5/2018
  */
-const Transaction = require("./src/main/models/Transaction")
-const TransactionalBlockchain = require("./src/main/models/TransactionalBlockchain")
-const { Block, MessageBlock, TransactionalBlock } = require("./src/main/models/blocks")
+const { TransactionalBlockchain,
+        MessageBlockchain,
+        Block,
+        MessageBlock,
+        TransactionalBlock,
+        Transaction} = require("./src/main/models")
 
-module.exports = {
-    Transaction,
+
+module.exports = { 
     TransactionalBlockchain,
+    MessageBlockchain,
     Block,
     MessageBlock,
-    TransactionalBlock
+    TransactionalBlock,
+    Transaction
 }

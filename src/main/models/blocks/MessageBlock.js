@@ -6,6 +6,7 @@ module.exports = class MessageBlock extends Block{
     constructor(timestamp, previousBlockHash = '', message = ""){
         super(timestamp, previousBlockHash)
         this.message = message;
+        this.hash = this.createHash()
     }
 
     createHash(){

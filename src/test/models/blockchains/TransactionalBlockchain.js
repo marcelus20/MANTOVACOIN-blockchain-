@@ -1,6 +1,6 @@
 var assert = require('assert');
-const Transaction = require('../../main/models/Transaction');
-const TransactionalBlockchain = require('../../main/models/TransactionalBlockchain');
+const Transaction = require('../../../main/models/Transaction');
+const TransactionalBlockchain = require('../../../main/models/blockchains/TransactionalBlockchain');
 
 describe("TransactionalBlockchain",()=>{
     describe("constructor", ()=>{
