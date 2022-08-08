@@ -44,7 +44,7 @@ module.exports = class TransactionalBlockchain extends Blockchain{
      * The parameter bellow indicates where the blockchain should transfer the creation of MANTOVACOINS by a given address
      * @param winnerMinerAddress
      */
-    miningPendingTransactions(winnerMinerAddress){
+    async minePendingTransactions(winnerMinerAddress){
 
         if(this.pendingTransactions.length > 0){
             //creating instance of new block
@@ -55,7 +55,7 @@ module.exports = class TransactionalBlockchain extends Blockchain{
                 .withTransactions(this.pendingTransactions)
                 .withHash();
 
-            const minedBlock = block.mine(this.difficulty);
+            const minedBlock = await block.mine(this.difficulty);
 
             this.chain.push(minedBlock);
 
@@ -99,7 +99,7 @@ module.exports = class TransactionalBlockchain extends Blockchain{
      * 
      * Mines the block in the position given. It will only mine if the previous block is valid. 
      */
-    mineSpecificBlock(blockPosition = 1){
+    async mineSpecificBlock(blockPosition = 1){
         const block = this.chain[blockPosition < 0 ? 0 : blockPosition]
         const toMineBlock = new TransactionalBlock()
             .withTimestamp(block.timestamp)
@@ -108,7 +108,7 @@ module.exports = class TransactionalBlockchain extends Blockchain{
             .withTransactions(block.transactions)
             .withHash()
         
-        const minedBlock = toMineBlock.mine(this.difficulty);
+        const minedBlock = await toMineBlock.mine(this.difficulty);
         this.chain[blockPosition] = minedBlock
     }
 }

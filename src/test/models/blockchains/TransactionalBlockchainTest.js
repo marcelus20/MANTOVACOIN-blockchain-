@@ -50,14 +50,14 @@ describe("TransactionalBlockchain",()=>{
 })
 
 describe("TransactionalBlockchain",()=>{
-    describe("miningPendingTransactions", ()=>{
-        it("Should create a new block if there are pending transactions", ()=>{
+    describe("minePendingTransactions", ()=>{
+        it("Should create a new block if there are pending transactions", async ()=>{
             // Given Blockchain
             const blockchain = new TransactionalBlockchain()
 
             // When
             blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 20))
-            blockchain.miningPendingTransactions("minerAddress")
+            await blockchain.minePendingTransactions("minerAddress")
             
             // Then
             assert.equal(blockchain.chain.length, 2)
@@ -66,13 +66,13 @@ describe("TransactionalBlockchain",()=>{
 })
 
 describe("TransactionalBlockchain",()=>{
-    describe("miningPendingTransactions", ()=>{
+    describe("minePendingTransactions", ()=>{
         it("Should not mine if there are no new transactions in pending transactions", ()=>{
             // Given Blockchain
             const blockchain = new TransactionalBlockchain()
 
             // When
-            blockchain.miningPendingTransactions("minerAddress")
+            blockchain.minePendingTransactions("minerAddress")
             
             // Then
             assert.equal(blockchain.chain.length, 1)
@@ -88,7 +88,7 @@ describe("TransactionalBlockchain",()=>{
 
             // When
             blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 20))
-            blockchain.miningPendingTransactions("minerAddress")
+            blockchain.minePendingTransactions("minerAddress")
             
             // Then
             assert.equal(0, blockchain.checkBalanceOfTheAddress("minerAddress"))
@@ -98,15 +98,15 @@ describe("TransactionalBlockchain",()=>{
 
 describe("TransactionalBlockchain",()=>{
     describe("checkBalanceOfTheAddress", ()=>{
-        it("When miner mines only 1 block, the balance of 100 will only show available after another block gets mined after.", ()=>{
+        it("When miner mines only 1 block, the balance of 100 will only show available after another block gets mined after.", async ()=>{
             // Given Blockchain
             const blockchain = new TransactionalBlockchain()
 
             // When
             blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 20))
-            blockchain.miningPendingTransactions("minerAddress") // Mining before the latest block
+            await blockchain.minePendingTransactions("minerAddress") // Mining before the latest block
             blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 20))
-            blockchain.miningPendingTransactions("minerAddress") // Mining the latest block
+            await blockchain.minePendingTransactions("minerAddress") // Mining the latest block
 
             // Then
             assert.equal(100, blockchain.checkBalanceOfTheAddress("minerAddress"))
@@ -116,15 +116,15 @@ describe("TransactionalBlockchain",()=>{
 
 describe("TransactionalBlockchain",()=>{
     describe("checkBalanceOfTheAddress", ()=>{
-        it("When miner mines only 1 block, the balance of 100 will only show available after another block gets mined after, even if by another miner.", ()=>{
+        it("When miner mines only 1 block, the balance of 100 will only show available after another block gets mined after, even if by another miner.", async ()=>{
             // Given Blockchain
             const blockchain = new TransactionalBlockchain()
 
             // When
             blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 20))
-            blockchain.miningPendingTransactions("minerAddress1") // Mining first block
+            await blockchain.minePendingTransactions("minerAddress1") // Mining first block
             blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 20))
-            blockchain.miningPendingTransactions("minerAddress2") // Mining second block
+            await blockchain.minePendingTransactions("minerAddress2") // Mining second block
 
             // Then
             assert.equal(100, blockchain.checkBalanceOfTheAddress("minerAddress1"))
@@ -134,13 +134,13 @@ describe("TransactionalBlockchain",()=>{
 
 describe("TransactionalBlockchain",()=>{
     describe("checkBalanceOfTheAddress", ()=>{
-        it("Should return 20 to dummyAddress 2 after it receives the transaction and block gets mined.", ()=>{
+        it("Should return 20 to dummyAddress 2 after it receives the transaction and block gets mined.", async ()=>{
             // Given Blockchain
             const blockchain = new TransactionalBlockchain()
 
             // When
             blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 20))
-            blockchain.miningPendingTransactions("minerAddress1")
+            await blockchain.minePendingTransactions("minerAddress1")
             
             // Then
             assert.equal(20, blockchain.checkBalanceOfTheAddress("dummyAddress2"))
@@ -172,11 +172,11 @@ describe("TransactionalBlockchain",()=>{
 
             // When
             blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 20))
-            blockchain.miningPendingTransactions("minerAddress1")
+            blockchain.minePendingTransactions("minerAddress1")
             blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 50))
-            blockchain.miningPendingTransactions("minerAddress1")
+            blockchain.minePendingTransactions("minerAddress1")
             blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 50))
-            blockchain.miningPendingTransactions("minerAddress1")
+            blockchain.minePendingTransactions("minerAddress1")
             
             // Then
             assert.equal(true, blockchain.isValid())
@@ -186,18 +186,18 @@ describe("TransactionalBlockchain",()=>{
 
 describe("TransactionalBlockchain",()=>{
     describe("isValid", ()=>{
-        it("Should return false if after mining, data about it is changed and not mined/validated after", ()=>{
+        it("Should return false if after mining, data about it is changed and not mined/validated after", async ()=>{
             // Given Blockchain
             const blockchain = new TransactionalBlockchain()
 
             // When
             blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 20))
             blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 5))
-            blockchain.miningPendingTransactions("minerAddress1")
+            await blockchain.minePendingTransactions("minerAddress1")
             blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 50))
-            blockchain.miningPendingTransactions("minerAddress1")
+            await blockchain.minePendingTransactions("minerAddress1")
             blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 50))
-            blockchain.miningPendingTransactions("minerAddress1")
+            await blockchain.minePendingTransactions("minerAddress1")
 
             // Changing/tampering the value of the second transaction of the first block to 500
             blockchain.chain[1].transactions[1].value = 500
@@ -210,18 +210,18 @@ describe("TransactionalBlockchain",()=>{
 
 describe("TransactionalBlockchain",()=>{
     describe("detectWhichBlockIsInvalid", ()=>{
-        it("Should return 1 if the second block got tampered with.", ()=>{
+        it("Should return 1 if the second block got tampered with.", async ()=>{
             // Given Blockchain
             const blockchain = new TransactionalBlockchain()
 
             // When
             blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 20))// <- second block
             blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 5))
-            blockchain.miningPendingTransactions("minerAddress1")
+            await blockchain.minePendingTransactions("minerAddress1")
             blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 50))
-            blockchain.miningPendingTransactions("minerAddress1")
+            await blockchain.minePendingTransactions("minerAddress1")
             blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 50))
-            blockchain.miningPendingTransactions("minerAddress1")
+            await blockchain.minePendingTransactions("minerAddress1")
 
             // Changing/tampering the value of the second transaction of the second block to 500
             const currentBlock = {...blockchain.chain[1]}
@@ -247,7 +247,7 @@ describe("TransactionalBlockchain",()=>{
 
 describe("TransactionalBlockchain",()=>{
     describe("isValid", ()=>{
-        it("Should return true when tampered with as long as each block gets re-validated/mined again.", ()=>{
+        it("Should return true when tampered with as long as each block gets re-validated/mined again.", async ()=>{
             // Given Blockchain
             const blockchain = new TransactionalBlockchain()
             blockchain.difficulty = 1
@@ -255,20 +255,20 @@ describe("TransactionalBlockchain",()=>{
             // When
             blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 20))
             blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 5))
-            blockchain.miningPendingTransactions("minerAddress1")
+            await blockchain.minePendingTransactions("minerAddress1")
             blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 50))
-            blockchain.miningPendingTransactions("minerAddress1")
+            await blockchain.minePendingTransactions("minerAddress1")
             blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 50))
-            blockchain.miningPendingTransactions("minerAddress1")
+            await blockchain.minePendingTransactions("minerAddress1")
 
             // Changing/tampering the value of the second transaction of the first block to 500
 
             blockchain.chain[1].transactions[1].value = 500
 
             // Now mining each block one by one. 
-            blockchain.mineSpecificBlock(1);
-            blockchain.mineSpecificBlock(2);
-            blockchain.mineSpecificBlock(3);
+            await blockchain.mineSpecificBlock(1);
+            await blockchain.mineSpecificBlock(2);
+            await blockchain.mineSpecificBlock(3);
             
             // Then
             assert.equal(blockchain.isValid(), true)
@@ -278,7 +278,7 @@ describe("TransactionalBlockchain",()=>{
 
 describe("TransactionalBlockchain",()=>{
     describe("isValid", ()=>{
-        it("Should return true when tampered with in the genesis block as long as each block gets re-validated/mined again until the end of the chain.", ()=>{
+        it("Should return true when tampered with in the genesis block as long as each block gets re-validated/mined again until the end of the chain.", async ()=>{
             // Given Blockchain
             const blockchain = new TransactionalBlockchain()
             blockchain.difficulty = 1
@@ -286,21 +286,21 @@ describe("TransactionalBlockchain",()=>{
             // When
             blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 20))
             blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 5))
-            blockchain.miningPendingTransactions("minerAddress1")
+            await blockchain.minePendingTransactions("minerAddress1")
             blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 50))
-            blockchain.miningPendingTransactions("minerAddress1")
+            await blockchain.minePendingTransactions("minerAddress1")
             blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 50))
-            blockchain.miningPendingTransactions("minerAddress1")
+            await blockchain.minePendingTransactions("minerAddress1")
 
             // Changing/tampering the value of the transaction of the genesis block
 
             blockchain.chain[0].transactions[0].value = 500
 
             // Now mining each block one by one. 
-            blockchain.mineSpecificBlock(0);
-            blockchain.mineSpecificBlock(1);
-            blockchain.mineSpecificBlock(2);
-            blockchain.mineSpecificBlock(3);
+            await blockchain.mineSpecificBlock(0);
+            await blockchain.mineSpecificBlock(1);
+            await blockchain.mineSpecificBlock(2);
+            await blockchain.mineSpecificBlock(3);
             
             // Then
             assert.equal(blockchain.isValid(), true)
@@ -318,11 +318,11 @@ describe("TransactionalBlockchain",()=>{
             // When
             blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 20))
             blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 5))
-            blockchain.miningPendingTransactions("minerAddress1")
+            blockchain.minePendingTransactions("minerAddress1")
             blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 50))
-            blockchain.miningPendingTransactions("minerAddress1")
+            blockchain.minePendingTransactions("minerAddress1")
             blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 50))
-            blockchain.miningPendingTransactions("minerAddress1")
+            blockchain.minePendingTransactions("minerAddress1")
 
             // Changing/tampering the value of the transaction of the genesis block
 
@@ -355,12 +355,12 @@ describe("TransactionalBlockchain",()=>{
 
 describe("TransactionalBlockchain",()=>{
     describe("mineSpecificBlock",()=>{
-        it("Should set the previousBlockHash to an empty string if the parameter value is 0 (which defaults to genesis block)",()=>{
+        it("Should set the previousBlockHash to an empty string if the parameter value is 0 (which defaults to genesis block)", async()=>{
             //given 
             const blockchain = new TransactionalBlockchain()
             const emptyString = blockchain.chain[0].previousBlockHash
             // when
-            blockchain.mineSpecificBlock(0)
+             await blockchain.mineSpecificBlock(0)
             // Then
             assert.equal(blockchain.chain[0].previousBlockHash, emptyString)
         })
@@ -376,7 +376,7 @@ describe("TransactionalBlockchain",()=>{
             // when
             blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 20))
             blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 5))
-            blockchain.miningPendingTransactions("minerAddress1")
+            blockchain.minePendingTransactions("minerAddress1")
 
             // Tampering with genesis block
             blockchain.chain[0].transactions.push(new Transaction("dummyAddress1", "dummyAddress2", 200))
@@ -396,7 +396,7 @@ describe("TransactionalBlockchain",()=>{
             // when
             blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 20))
             blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 5))
-            blockchain.miningPendingTransactions("minerAddress1")
+            blockchain.minePendingTransactions("minerAddress1")
 
             // Tampering with genesis block
             blockchain.chain[0].transactions.push(new Transaction("dummyAddress1", "dummyAddress2", 200))

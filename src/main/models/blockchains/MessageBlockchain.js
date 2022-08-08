@@ -29,7 +29,7 @@ module.exports = class MessageBlockchain extends Blockchain{
 
 
 
-    miningPendingMessage(){
+    async minePendingMessage(){
         const block = new MessageBlock()
             .withTimestamp(Date.now())
             .withPreviousBlockHash(this.getLatestBlock().hash)
@@ -38,7 +38,7 @@ module.exports = class MessageBlockchain extends Blockchain{
             .withHash();
 
         
-        const minedBlock = block.mine(this.difficulty);
+        const minedBlock = await block.mine(this.difficulty);
         this.chain.push(minedBlock);
 
         this.pendingMessage = "";        
@@ -56,7 +56,7 @@ module.exports = class MessageBlockchain extends Blockchain{
      * 
      * Mines the block in the position given. It will only mine if the previous block is valid. 
      */
-    mineSpecificBlock(blockPosition = 1){
+    async mineSpecificBlock(blockPosition = 1){
         const block = this.chain[blockPosition < 0 ? 0 : blockPosition]
         const toMineBlock = new MessageBlock()
             .withTimestamp(block.timestamp)
@@ -65,7 +65,8 @@ module.exports = class MessageBlockchain extends Blockchain{
             .withMessage(block.message)
             .withHash()
 
-        const minedBlock = toMineBlock.mine(this.difficulty)
+        const minedBlock = await toMineBlock.mine(this.difficulty)
+
         this.chain[blockPosition] = minedBlock
     }
 }

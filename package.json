@@ -1,6 +1,6 @@
 {
   "name": "mantovacoin",
-  "version": "1.0.0-SNAPSHOT",
+  "version": "1.0.0",
   "description": "Basic Blockchain Modules",
   "main": "index.js",
   "scripts": {

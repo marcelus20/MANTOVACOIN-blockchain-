@@ -67,12 +67,12 @@ describe("TransactionalBlock",()=>{
 
 describe("TransactionalBlock",()=>{
     describe("mine function", ()=>{
-        it("Should generate a hash that starts with '000' when difficulty is 3", ()=>{
+        it("Should generate a hash that starts with '000' when difficulty is 3", async ()=>{
             // Given Block
             const block = new TransactionalBlock();
 
             // When
-            const minedBlock = block.mine(3)
+            const minedBlock = await block.mine(3)
             
             // Then
             assert.equal(minedBlock.hash.startsWith("000"), true)

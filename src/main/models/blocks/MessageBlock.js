@@ -61,7 +61,7 @@ module.exports = class MessageBlock extends Block{
      * PROOF OF WORK
      * @param difficulty
      */
-    mine(difficulty = 0){
+    async mine(difficulty = 0){
         let blockToReturn = new MessageBlock(this.timestamp, this.previousBlockHash, this.hash, this.nonce, this.message)
         while(blockToReturn.hash.substring(0, difficulty) !== Array(difficulty+1).join("0")){
             

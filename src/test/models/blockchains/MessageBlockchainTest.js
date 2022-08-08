@@ -18,14 +18,14 @@ describe("MessageBlockchain",()=>{
 })
 
 describe("MessageBlockchain",()=>{
-    describe("miningPendingMessage", ()=>{
-        it("Should work even if the pendingMessage contains an empty string.", ()=>{
+    describe("minePendingTransactions", ()=>{
+        it("Should work even if the pendingMessage contains an empty string.", async ()=>{
             // Given Blockchain
             const blockchain = new MessageBlockchain()
 
             // When message contains empty string.
             blockchain.createMessage("")
-            blockchain.miningPendingMessage()
+            await blockchain.minePendingMessage()
 
             
             // Then
@@ -35,14 +35,14 @@ describe("MessageBlockchain",()=>{
 })
 
 describe("MessageBlockchain",()=>{
-    describe("miningPendingMessage", ()=>{
-        it("Should mine after the message has been created.", ()=>{
+    describe("minePendingTransactions", ()=>{
+        it("Should mine after the message has been created.", async ()=>{
             // Given Blockchain
             const blockchain = new MessageBlockchain()
 
             // When message contains empty string.
             blockchain.createMessage("dummy message here")
-            blockchain.miningPendingMessage()
+            await blockchain.minePendingMessage()
 
             
             // Then
@@ -53,17 +53,17 @@ describe("MessageBlockchain",()=>{
 
 describe("MessageBlockchain",()=>{
     describe("isValid", ()=>{
-        it("Should return true if blocks have not been tampered with.", ()=>{
+        it("Should return true if blocks have not been tampered with.", async ()=>{
             // Given Blockchain
             const blockchain = new MessageBlockchain()
 
             // When message contains empty string.
             blockchain.createMessage("dummy message here")
-            blockchain.miningPendingMessage()
+            await blockchain.minePendingMessage()
             blockchain.createMessage("another dummy message here in the second block")
-            blockchain.miningPendingMessage()
+            await blockchain.minePendingMessage()
             blockchain.createMessage("another dummy message here in the third block")
-            blockchain.miningPendingMessage()
+            await blockchain.minePendingMessage()
 
             
             // Then
@@ -74,17 +74,17 @@ describe("MessageBlockchain",()=>{
 
 describe("MessageBlockchain",()=>{
     describe("isValid", ()=>{
-        it("Should return false if block 1 have been tampered with and blocks have not been remind until the end of chain.", ()=>{
+        it("Should return false if block 1 have been tampered with and blocks have not been remind until the end of chain.", async ()=>{
             // Given Blockchain
             const blockchain = new MessageBlockchain()
 
             // When message contains empty string.
             blockchain.createMessage("dummy message here")
-            blockchain.miningPendingMessage()
+            await blockchain.minePendingMessage()
             blockchain.createMessage("another dummy message here in the second block")
-            blockchain.miningPendingMessage()
+            await blockchain.minePendingMessage()
             blockchain.createMessage("another dummy message here in the third block")
-            blockchain.miningPendingMessage()
+            await blockchain.minePendingMessage()
 
             // Tampering with the first block after genesis: 
             blockchain.chain[1].message = "Tampering with Dummy Message."
@@ -99,17 +99,17 @@ describe("MessageBlockchain",()=>{
 
 describe("MessageBlockchain",()=>{
     describe("isValid", ()=>{
-        it("Should return true if blocks were tampered with as long as each block gets re-mined until the end of the chain.", ()=>{
+        it("Should return true if blocks were tampered with as long as each block gets re-mined until the end of the chain.", async ()=>{
             // Given Blockchain
             const blockchain = new MessageBlockchain()
 
             // When message contains empty string.
             blockchain.createMessage("dummy message here")
-            blockchain.miningPendingMessage()
+            await blockchain.minePendingMessage()
             blockchain.createMessage("another dummy message here in the second block")
-            blockchain.miningPendingMessage()
+            await blockchain.minePendingMessage()
             blockchain.createMessage("another dummy message here in the third block")
-            blockchain.miningPendingMessage()
+            await blockchain.minePendingMessage()
 
             // Tampering with the first block after genesis:
             const currentBlock = blockchain.chain[1]
@@ -123,9 +123,9 @@ describe("MessageBlockchain",()=>{
             blockchain.chain[1] = tamperedBlock
 
             // Mining each block until the end of the chain.
-            blockchain.mineSpecificBlock(1)
-            blockchain.mineSpecificBlock(2)
-            blockchain.mineSpecificBlock(3)
+            await blockchain.mineSpecificBlock(1)
+            await blockchain.mineSpecificBlock(2)
+            await blockchain.mineSpecificBlock(3)
             
             // Then
             assert.equal(true, blockchain.isValid())
@@ -135,24 +135,24 @@ describe("MessageBlockchain",()=>{
 
 describe("MessageBlockchain",()=>{
     describe("isValid", ()=>{
-        it("Should return false if blocks were tampered with and blocks didn't get re-mined all the way to the end of the chain.", ()=>{
+        it("Should return false if blocks were tampered with and blocks didn't get re-mined all the way to the end of the chain.", async ()=>{
             // Given Blockchain
             const blockchain = new MessageBlockchain()
 
             // When message contains empty string.
             blockchain.createMessage("dummy message here")
-            blockchain.miningPendingMessage()
+            await blockchain.minePendingMessage()
             blockchain.createMessage("another dummy message here in the second block")
-            blockchain.miningPendingMessage()
+            await blockchain.minePendingMessage()
             blockchain.createMessage("another dummy message here in the third block")
-            blockchain.miningPendingMessage()
+            await blockchain.minePendingMessage()
 
             // Tampering with the first block after genesis: 
             blockchain.chain[1].message = "Tampering with Dummy Message."
 
             // Mining each block except the latest
-            blockchain.mineSpecificBlock(1)
-            blockchain.mineSpecificBlock(2)
+            await blockchain.mineSpecificBlock(1)
+            await blockchain.mineSpecificBlock(2)
             
 
             
@@ -164,12 +164,12 @@ describe("MessageBlockchain",()=>{
 
 describe("MessageBlockchain",()=>{
     describe("mineSpecificBlock",()=>{
-        it("Should set the previousBlockHash to an empty string if the parameter value is 0 (which defaults to genesis block)",()=>{
+        it("Should set the previousBlockHash to an empty string if the parameter value is 0 (which defaults to genesis block)", async ()=>{
             //given 
             const blockchain = new MessageBlockchain()
             const emptyString = blockchain.chain[0].previousBlockHash
             // when
-            blockchain.mineSpecificBlock(0)
+            await blockchain.mineSpecificBlock(0)
             // Then
             assert.equal(blockchain.chain[0].previousBlockHash, emptyString)
         })
@@ -184,7 +184,7 @@ describe("MessageBlockchain",()=>{
 
             // when
             blockchain.createMessage("dummy message")
-            blockchain.miningPendingMessage()
+            blockchain.minePendingMessage()
 
             // Tampering with genesis block
             blockchain.chain[0].message = "tampered dummy message"
@@ -204,7 +204,7 @@ describe("MessageBlockchain",()=>{
             // when
             // when
             blockchain.createMessage("dummy message")
-            blockchain.miningPendingMessage()
+            blockchain.minePendingMessage()
 
             // Tampering with genesis block
             // blockchain.chain[0].message = "tampered dummy message"
@@ -227,18 +227,18 @@ describe("MessageBlockchain",()=>{
 
 describe("MessageBlockchain",()=>{
     describe("detectWhichBlockIsInvalid",()=>{
-        it("Should return 2 when the third block gets tampered and didn't get re-mined all the way to the end of chain.",()=>{
+        it("Should return 2 when the third block gets tampered and didn't get re-mined all the way to the end of chain.", async ()=>{
             //given 
             const blockchain = new MessageBlockchain()
 
             // when
             // when
             blockchain.createMessage("dummy message")
-            blockchain.miningPendingMessage()
+            await blockchain.minePendingMessage()
             blockchain.createMessage("dummy message")
-            blockchain.miningPendingMessage()
+            await blockchain.minePendingMessage()
             blockchain.createMessage("dummy message")
-            blockchain.miningPendingMessage()
+            await blockchain.minePendingMessage()
 
             // Tampering with genesis block
             blockchain.chain[2].message = "tampered dummy message"

@@ -131,7 +131,7 @@ The default constructor will generate the following default values:
     blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 5))
 
     // Mining the pending transactions
-    blockchain.miningPendingTransactions("minerAddress1")
+    await blockchain.minePendingTransactions("minerAddress1")
 
     // Checking integrity of the blockchain
     blockchain.isValid() // <= Returns true or false.
@@ -158,13 +158,13 @@ To get the blocks validated again, you should mine one by one. For that, you can
     blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 20))
     blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 5))
     // Mining the second block (index 1)
-    blockchain.miningPendingTransactions("minerAddress1")
+    await blockchain.minePendingTransactions("minerAddress1")
     blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 50))
     // Mining the third block (index 2)
-    blockchain.miningPendingTransactions("minerAddress1")
+    await blockchain.minePendingTransactions("minerAddress1")
     blockchain.createTransaction(new Transaction("dummyAddress1", "dummyAddress2", 50))
     // Mining the second block (index 3)
-    blockchain.miningPendingTransactions("minerAddress1")
+    await blockchain.minePendingTransactions("minerAddress1")
 
     // Changing/tampering with the value of the second transaction of the first block, second transaction to 500
     blockchain.chain[1].transactions[1].value = 500
@@ -172,9 +172,9 @@ To get the blocks validated again, you should mine one by one. For that, you can
     blockchain.isValid() // <= Will return false
 
     // Now mining each block one by one till the end of the chain. 
-    blockchain.mineSpecificBlock(1);
-    blockchain.mineSpecificBlock(2);
-    blockchain.mineSpecificBlock(3);
+    await blockchain.mineSpecificBlock(1);
+    await blockchain.mineSpecificBlock(2);
+    await blockchain.mineSpecificBlock(3);
 
     blockchain.isValid() // <= Will return true
 ```
@@ -201,7 +201,7 @@ The default constructor will generate the following default values:
     blockchain.createMessage("Message here")
 
     // Mining the block with the created message 
-    blockchain.miningPendingMessage()
+    await blockchain.minePendingMessage()
 
     // Checking integrity of the blockchain
     blockchain.isValid() // <= Returns true or false.
@@ -223,13 +223,13 @@ To get the blocks validated again, you should mine one by one. For that, you can
 
     blockchain.createMessage("dummy message here")
     // Mining second block (index 1)
-    blockchain.miningPendingMessage()
+    await blockchain.minePendingMessage()
     blockchain.createMessage("another dummy message here in the third block")
     // Mining second block (index 2)
-    blockchain.miningPendingMessage()
+    await blockchain.minePendingMessage()
     blockchain.createMessage("another dummy message here in the fourth block")
     // Mining second block (index 2)
-    blockchain.miningPendingMessage()
+    await blockchain.minePendingMessage()
 
     // Tampering with the first block after genesis:
     const currentBlock = blockchain.chain[1]
@@ -246,11 +246,11 @@ To get the blocks validated again, you should mine one by one. For that, you can
     blockchain.isValid() // Will return false
 
     // Mining each block until the end of the chain.
-    blockchain.mineSpecificBlock(1)
-    blockchain.mineSpecificBlock(2)
-    blockchain.mineSpecificBlock(3)
+    await blockchain.mineSpecificBlock(1)
+    await blockchain.mineSpecificBlock(2)
+    await blockchain.mineSpecificBlock(3)
 
-    blockchain.isValid // Will return true
+    blockchain.isValid() // Will return true
 ```
 
 ## Considerations
@@ -265,8 +265,18 @@ The higher the difficulty rate, the longer the mining process will take and the 
 
     blocchain.createMessage("This is going to take a good few minutes to complete due to difficulty 6")
 
-    blockchain.miningPendingMessage()
+    await blockchain.minePendingMessage()
 ```
+
+### Promise-return mining methods
+Because mining can take a long time to complete, the mining related methods are asyncronous, which indicates that it will return a promise. You are expected to use the **await** keyword, which will work inside **async** functions, or you can use the *Promise.prototype.then()* method to make a chained logic calls. The methods are: 
+* *TransactionalBlockchain.prototype.minePendingTransactions* 
+* *TransactionalBlockchain.prototype.mineSpecificBlock* 
+* *MessageBlockchain.prototype.minePendingMessage*
+* *MessageBlockchain.prototype.mineSpecificBlock*
+* *Block.prototype.mine*
+* *MessageBlock.prototype.mine*
+* *TransactionalBlock.prototype.mine*
 
 ## License
 [ISC](https://www.isc.org/licenses/)
